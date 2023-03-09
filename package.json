@@ -4,6 +4,9 @@
   "description": "Interface to send notifications to WhatsApp",
   "main": "index.js",
   "repository": "https://github.com/fantastica-fabrica-de-chocolates/wpp-web",
+  "scripts": {
+    "dev": "node index.js"
+  },
   "author": "Juliano Stroschon",
   "license": "MIT",
   "private": false,
