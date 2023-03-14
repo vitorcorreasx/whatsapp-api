@@ -1,14 +1,10 @@
 const { buildClient } = require("./client");
 
 const send = async (phone, body) => {
-  const chatId = `${phone}@c.us`;
+  const receiverId = `${phone}@c.us`;
+  console.log(`Client builded. Trying to send "${body}" to "${receiverId}"`);
   const client = await buildClient();
-  console.log("client builded");
-  // return await client.sendMessage(chatId, body);
-  // console.log("Status da Msg: ", { status });
-  // return
-  //   status,
-  // };
+  return await client.sendMessage(receiverId, body);
 };
 
 module.exports = { send };
