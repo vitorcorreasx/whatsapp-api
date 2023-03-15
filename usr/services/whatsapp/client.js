@@ -7,6 +7,16 @@ const MESSAGE_DEFAULT = {
   test: "através de mensagens do WhatsApp é possível descobrir diversas informações do seu dispositivo, isso não é necessariamente uma quebra de segurança, porém é interessante que todos saibam quais informações estão disponíveis para quem tem seu WhatsApp",
 };
 
+const MESSAGE_ACK = {
+  ERROR: -1,
+  VALID: 0,
+};
+
+const TIME_HELPER = {
+  TEN_SECONDS: 10000,
+  HUNDRED_MILISEC: 100,
+};
+
 const receivers = ["555584241789"];
 
 /**
@@ -14,6 +24,8 @@ const receivers = ["555584241789"];
  * @returns {Promise<WhatsAppClient>}
  */
 async function buildClient() {
+  const messages = new Map();
+
   const client = new Client({
     authStrategy: new LocalAuth({
       clientId: "client-one",
@@ -27,29 +39,53 @@ async function buildClient() {
     })
     .on("ready", () => {
       console.log("Ready");
-
-      // receivers.map(async (value) => {
-      // console.log(`Message has been sent to -> ${value}`);
-      // this.sendMessage(`${value}@c.us`, "Server is back online");
-      // });
     })
     .on("message", async (message) => {
       console.log("Message Received!", {
         message: message.body,
-        // from: message_data.notifyName,
       });
       const reply = MESSAGE_DEFAULT[message.body];
       if (reply) {
-        return x1.reply(reply);
+        message.reply(reply);
       }
     })
-    .on("message_ack", (message, ack) => {
-      console.log("message_ack: ", ack);
+    .on("message_ack", async (message, ack) => {
+      messages.set(message.id.id, ack);
     });
 
   await client.initialize();
 
-  return client;
+  return {
+    async sendMessage(receiverId, body) {
+      const message = await client.sendMessage(receiverId, body);
+      const messageId = message.id.id;
+
+      let watchEvent;
+      let timeoutEvent;
+
+      console.log(receiverId, "Client message obj", obj);
+      return new Promise((resolve, reject) => {
+        watchEvent = setInterval(() => {
+          const statusMessage = messages.get(messageId);
+          console.log(receiverId, statusMessage, obj);
+          if (statusMessage > 1) {
+            resolve({ statusMessage });
+          }
+          if (statusMessage === MESSAGE_ACK.ERROR) {
+            reject(new Error("Failed to send message"));
+          }
+        }, TIME_HELPER.HUNDRED_MILISEC);
+
+        timeoutEvent = setTimeout(() => {
+          reject(new Error("WhatsApp message timeout reached"));
+        }, TIME_HELPER.TEN_SECONDS);
+      }).finally(() => {
+        clearInterval(watchEvent);
+        clearTimeout(timeoutEvent);
+        messages.delete(messageId);
+      });
+    },
+  };
 }
 
 module.exports = { buildClient };
