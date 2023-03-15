@@ -17,8 +17,6 @@ const TIME_HELPER = {
   HUNDRED_MILISEC: 100,
 };
 
-const receivers = ["555584241789"];
-
 /**
  *
  * @returns {Promise<WhatsAppClient>}
