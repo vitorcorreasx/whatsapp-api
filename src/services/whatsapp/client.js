@@ -1,10 +1,9 @@
-const qrcode = require("qrcode-terminal");
-const { Client, LocalAuth } = require("whatsapp-web.js");
-const { ActualDate } = require("../../../helpers/data");
+const qrcode = require('qrcode-terminal');
+const { Client, LocalAuth } = require('whatsapp-web.js');
 
 const MESSAGE_DEFAULT = {
-  ping: "pong",
-  test: "através de mensagens do WhatsApp é possível descobrir diversas informações do seu dispositivo, isso não é necessariamente uma quebra de segurança, porém é interessante que todos saibam quais informações estão disponíveis para quem tem seu WhatsApp",
+  ping: 'pong',
+  test: 'resposta automática utilizando whatsApp-web.js',
 };
 
 const MESSAGE_ACK = {
@@ -26,20 +25,20 @@ async function buildClient() {
 
   const client = new Client({
     authStrategy: new LocalAuth({
-      clientId: "client-one",
+      clientId: 'client-one',
     }),
   })
-    .on("authenticated", (session) => {
+    .on('authenticated', () => {
       console.log("You're authenticated");
     })
-    .on("qr", (qr) => {
+    .on('qr', (qr) => {
       qrcode.generate(qr, { small: true });
     })
-    .on("ready", () => {
-      console.log("Ready");
+    .on('ready', () => {
+      console.log('Ready');
     })
-    .on("message", async (message) => {
-      console.log("Message Received!", {
+    .on('message', async (message) => {
+      console.log('Message Received!', {
         message: message.body,
       });
       const reply = MESSAGE_DEFAULT[message.body];
@@ -47,7 +46,7 @@ async function buildClient() {
         message.reply(reply);
       }
     })
-    .on("message_ack", async (message, ack) => {
+    .on('message_ack', async (message, ack) => {
       messages.set(message.id.id, ack);
     });
 
@@ -61,21 +60,21 @@ async function buildClient() {
       let watchEvent;
       let timeoutEvent;
 
-      console.log(receiverId, "Client message obj", message);
+      console.log(receiverId, 'Client message obj', message);
       return new Promise((resolve, reject) => {
         watchEvent = setInterval(() => {
           const statusMessage = messages.get(messageId);
           console.log(receiverId, statusMessage);
-          if (statusMessage > 1) {
+          if (statusMessage > MESSAGE_ACK.VALID) {
             resolve({ statusMessage });
           }
           if (statusMessage === MESSAGE_ACK.ERROR) {
-            reject(new Error("Failed to send message"));
+            reject(new Error('Failed to send message'));
           }
         }, TIME_HELPER.HUNDRED_MILISEC);
 
         timeoutEvent = setTimeout(() => {
-          reject(new Error("WhatsApp message timeout reached"));
+          reject(new Error('WhatsApp message timeout reached'));
         }, TIME_HELPER.TEN_SECONDS);
       }).finally(() => {
         clearInterval(watchEvent);
