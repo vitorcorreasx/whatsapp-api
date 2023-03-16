@@ -2,14 +2,22 @@
   "name": "wpp-web-api",
   "version": "1.0.0",
   "description": "Interface to send notifications to WhatsApp",
-  "repository": "https://github.com/fantastica-fabrica-de-chocolates/wpp-web",
+  "repository": "https://github.com/partithura/wpp-web",
   "scripts": {
-    "dev": "node index.js"
+    "dev": "node index.js",
+    "lint": "eslint ./src ./test --ext .ts",
+    "lint:fix": "eslint ./src ./test --ext .ts --fix",
+    "style:check": "prettier --check 'src/**/*.ts' 'test/**/*.ts'",
+    "style:fix": "prettier --write 'src/**/*.ts' 'test/**/*.ts'"
   },
   "author": "Juliano Stroschon",
   "license": "MIT",
   "dependencies": {
     "qrcode-terminal": "^0.12.0",
     "whatsapp-web.js": "^1.19.4"
+  },
+  "devDependencies": {
+    "eslint": "^8.36.0",
+    "prettier": "^2.8.4"
   }
 }
