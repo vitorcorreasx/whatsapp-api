@@ -2,17 +2,13 @@
   "name": "wpp-web-api",
   "version": "1.0.0",
   "description": "Interface to send notifications to WhatsApp",
-  "main": "index.js",
   "repository": "https://github.com/fantastica-fabrica-de-chocolates/wpp-web",
   "scripts": {
     "dev": "node index.js"
   },
   "author": "Juliano Stroschon",
   "license": "MIT",
-  "private": false,
   "dependencies": {
-    "add": "^2.0.6",
-    "luxon": "^3.3.0",
     "qrcode-terminal": "^0.12.0",
     "whatsapp-web.js": "^1.19.4"
   }

@@ -61,11 +61,11 @@ async function buildClient() {
       let watchEvent;
       let timeoutEvent;
 
-      console.log(receiverId, "Client message obj", obj);
+      console.log(receiverId, "Client message obj", message);
       return new Promise((resolve, reject) => {
         watchEvent = setInterval(() => {
           const statusMessage = messages.get(messageId);
-          console.log(receiverId, statusMessage, obj);
+          console.log(receiverId, statusMessage);
           if (statusMessage > 1) {
             resolve({ statusMessage });
           }
