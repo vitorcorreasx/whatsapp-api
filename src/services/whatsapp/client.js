@@ -1,10 +1,5 @@
-const qrcode = require('qrcode-terminal');
 const { Client, LocalAuth } = require('whatsapp-web.js');
-
-const MESSAGE_DEFAULT = {
-  ping: 'pong',
-  test: 'resposta automática utilizando whatsApp-web.js',
-};
+const qrcode = require('qrcode-terminal');
 
 const MESSAGE_ACK = {
   ERROR: -1,
