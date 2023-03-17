@@ -27,6 +27,11 @@ async function buildClient() {
     authStrategy: new LocalAuth({
       clientId: 'client-one',
     }),
+    puppeteer: {
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    },
+    session: sessionCfg,
   })
     .on('authenticated', () => {
       console.log("You're authenticated");
