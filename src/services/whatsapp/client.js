@@ -31,7 +31,6 @@ async function buildClient() {
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     },
-    session: sessionCfg,
   })
     .on('authenticated', () => {
       console.log("You're authenticated");
