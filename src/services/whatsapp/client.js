@@ -32,23 +32,9 @@ async function buildClient() {
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     },
   })
-    .on('authenticated', () => {
-      console.log("You're authenticated");
-    })
+
     .on('qr', (qr) => {
       qrcode.generate(qr, { small: true });
-    })
-    .on('ready', () => {
-      console.log('Ready');
-    })
-    .on('message', async (message) => {
-      console.log('Message Received!', {
-        message: message.body,
-      });
-      const reply = MESSAGE_DEFAULT[message.body];
-      if (reply) {
-        message.reply(reply);
-      }
     })
     .on('message_ack', async (message, ack) => {
       messages.set(message.id.id, ack);
@@ -64,11 +50,9 @@ async function buildClient() {
       let watchEvent;
       let timeoutEvent;
 
-      console.log(receiverId, 'Client message obj', message);
       return new Promise((resolve, reject) => {
         watchEvent = setInterval(() => {
           const statusMessage = messages.get(messageId);
-          console.log(receiverId, statusMessage);
           if (statusMessage > MESSAGE_ACK.VALID) {
             resolve({ statusMessage });
           }
