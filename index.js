@@ -6,7 +6,7 @@ const http = require('http');
 const { send } = require('./src/services/whatsapp');
 
 const HOST = process.env.HOST || 'http://localhost';
-const SECRET = process.env.PORT || 'secret';
+const SECRET = process.env.SECRET || 'segredo';
 const PORT = process.env.PORT || 3001;
 const BASE_ROUTE = '/api/v1/send?token=';
 
