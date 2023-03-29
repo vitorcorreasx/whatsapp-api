@@ -2,9 +2,8 @@ const { buildClient } = require('./client');
 
 const SUFIX = 'c.us';
 
-const send = async (phone, body) => {
+const send = async (phone, body, client) => {
   try {
-    const client = await buildClient();
     return await client.sendMessage(`${phone}@${SUFIX}`, body);
   } catch (err) {
     new Error(err);

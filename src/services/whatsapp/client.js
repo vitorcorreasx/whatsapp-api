@@ -38,6 +38,7 @@ async function buildClient() {
   await client.initialize();
 
   return {
+    client,
     async sendMessage(receiverId, body) {
       const message = await client.sendMessage(receiverId, body);
       const messageId = message.id.id;
@@ -68,4 +69,39 @@ async function buildClient() {
   };
 }
 
-module.exports = { buildClient };
+/**
+ *
+ * @param {string} clientId
+ * @returns {Promise<WhatsAppClient>}
+ */
+async function constructClient(clientId) {
+  const messages = new Map();
+  console.log('constructing client');
+
+  const client = new Client({
+    authStrategy: new LocalAuth({
+      clientId,
+    }),
+    puppeteer: {
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    },
+  })
+
+    .on('qr', (qr) => {
+      qrcode.generate(qr, { small: true });
+    })
+    .on('error', (err) => console.log({ err }))
+    .on('ready', () => console.log('readyzim'))
+    .on('message_ack', async (message, ack) => {
+      messages.set(message.id.id, ack);
+    });
+  console.log(client);
+
+  return {
+    client,
+    messages,
+  };
+}
+
+module.exports = { buildClient, constructClient };
