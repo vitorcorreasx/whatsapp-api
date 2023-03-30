@@ -2,22 +2,24 @@ const http = require('http');
 
 const { sign } = require('jsonwebtoken');
 
-const SECRET = process.env.SECRET || 'segredo';
-const token =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwaG9uZW51bWJlciI6NTU5OTY5MjkwNDIsIm1lc3NhZ2UiOiJCb20gZGlhIiwiaWF0IjoxNjc5MDcyMzg2fQ.eJ5yfLepIFTpf_ziAGkK3e_Kv2xeLhhnyVza5tAXm4o';
+const {
+  ALLOWED_METHOD,
+  BASE_ROUTE,
+  SECRET,
+  PORT,
+  HOST,
+} = require('./src/util');
 
-function constructToken(message = 'aoba', phonenumber = 5555996929042) {
+function constructToken(message = 'Hello World', phonenumber = 5555999999999) {
   return sign({ message, phonenumber }, SECRET);
 }
-const port = process.env.PORT || 3001;
-const options = {
-  hostname: 'localhost',
-  port,
-  path: `/api/v1/send?token=${constructToken()}`,
-  method: 'POST',
-};
 
-// console.log(options);
+const options = {
+  path: BASE_ROUTE + constructToken(),
+  method: ALLOWED_METHOD,
+  hostname: HOST,
+  port: PORT,
+};
 
 const req = http.request(options, (res) => {
   console.log(`statusCode: ${res.statusCode}`);
