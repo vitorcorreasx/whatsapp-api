@@ -40,33 +40,37 @@ async function buildClient() {
   return {
     client,
     async sendMessage(receiverId, body) {
-      const message = await client.sendMessage(receiverId, body);
-      const messageId = message.id.id;
-
-      let watchEvent;
-      let timeoutEvent;
-
-      return new Promise((resolve, reject) => {
-        watchEvent = setInterval(() => {
-          const statusMessage = messages.get(messageId);
-          if (statusMessage > MESSAGE_ACK.VALID) {
-            resolve({ statusMessage });
-          }
-          if (statusMessage === MESSAGE_ACK.ERROR) {
-            reject(new Error('Failed to send message'));
-          }
-        }, TIME_HELPER.HUNDRED_MILISEC);
-
-        timeoutEvent = setTimeout(() => {
-          reject(new Error('WhatsApp message timeout reached'));
-        }, TIME_HELPER.TEN_SECONDS);
-      }).finally(() => {
-        clearInterval(watchEvent);
-        clearTimeout(timeoutEvent);
-        messages.delete(messageId);
-      });
+      await sendizinho(receiverId, body, client, messages);
     },
   };
+}
+
+async function sendizinho(receiverId, body, client, messages) {
+  const message = await client.sendMessage(receiverId, body);
+  const messageId = message.id.id;
+
+  let watchEvent;
+  let timeoutEvent;
+
+  return new Promise((resolve, reject) => {
+    watchEvent = setInterval(() => {
+      const statusMessage = messages.get(messageId);
+      if (statusMessage > MESSAGE_ACK.VALID) {
+        resolve({ statusMessage });
+      }
+      if (statusMessage === MESSAGE_ACK.ERROR) {
+        reject(new Error('Failed to send message'));
+      }
+    }, TIME_HELPER.HUNDRED_MILISEC);
+
+    timeoutEvent = setTimeout(() => {
+      reject(new Error('WhatsApp message timeout reached'));
+    }, TIME_HELPER.TEN_SECONDS);
+  }).finally(() => {
+    clearInterval(watchEvent);
+    clearTimeout(timeoutEvent);
+    messages.delete(messageId);
+  });
 }
 
 /**
@@ -76,7 +80,6 @@ async function buildClient() {
  */
 async function constructClient(clientId) {
   const messages = new Map();
-  console.log('constructing client');
 
   const client = new Client({
     authStrategy: new LocalAuth({
@@ -92,11 +95,12 @@ async function constructClient(clientId) {
       qrcode.generate(qr, { small: true });
     })
     .on('error', (err) => console.log({ err }))
-    .on('ready', () => console.log('readyzim'))
+    .on('ready', () => {
+      console.log('ready');
+    })
     .on('message_ack', async (message, ack) => {
       messages.set(message.id.id, ack);
     });
-  console.log(client);
 
   return {
     client,

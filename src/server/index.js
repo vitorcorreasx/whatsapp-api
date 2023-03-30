@@ -16,15 +16,21 @@ async function sendResponse(res, error, decodedToken, client) {
       JSON.stringify({ statusMessage: false, error: 'Invalid token' })
     );
   }
+  console.log('Token valid');
 
   const { phonenumber, message } = decodedToken.payload;
 
-  return res.end(JSON.stringify(await send(phonenumber, message, client)));
+  const response = await send(phonenumber, message, client);
+
+  return res.end(JSON.stringify(response));
 }
 
 async function buildServer() {
-  const service = await constructClient('client-one');
-  const client = service.client.initialize();
+  const { client, messages } = await constructClient('client-one');
+  // console.log(service);
+  await client.initialize();
+  console.log('client running');
+  // await service.client.sendMessage(`${5555996929042}@c.us`, 'Hello');
   const app = http.createServer((req, res) => {
     const url = new URL(req.url, `http://${req.headers.host}`);
     const token = url.searchParams.get('token');
@@ -35,7 +41,6 @@ async function buildServer() {
     }
 
     verify(token, SECRET, { complete: true }, (error, decoded) => {
-      console.log(client);
       sendResponse(res, error, decoded, client);
     });
   });
