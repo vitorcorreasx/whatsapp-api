@@ -1,5 +1,8 @@
+require('dotenv').config();
+
 const BASE_ROUTE = '/api/v1/send?token=';
 const SECRET = process.env.SECRET || 'segredo';
+const PORT = process.env.PORT || 3001;
 const HOST = process.env.HOST || 'http://localhost';
 const ALLOWED_METHOD = 'POST';
 
@@ -13,4 +16,5 @@ module.exports = {
   BASE_ROUTE,
   SECRET,
   constructResponse,
+  PORT,
 };
