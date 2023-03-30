@@ -17,7 +17,7 @@ function constructToken(message = 'Hello World', phonenumber = 5555999999999) {
 const options = {
   path: BASE_ROUTE + constructToken(),
   method: ALLOWED_METHOD,
-  hostname: HOST,
+  hostname: HOST.replace('http://', ''),
   port: PORT,
 };
 

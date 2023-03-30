@@ -4,7 +4,7 @@
   "description": "Interface to send notifications by WhatsApp",
   "repository": "https://github.com/partithura/wpp-web",
   "scripts": {
-    "dev": "nodemon index.js",
+    "dev": "node index.js",
     "start": "node index.js",
     "lint": "eslint ./src ./test --ext .ts",
     "lint:fix": "eslint ./src ./test --ext .ts --fix",
