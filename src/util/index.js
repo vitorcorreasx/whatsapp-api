@@ -11,10 +11,10 @@ function constructResponse(res, body) {
 }
 
 module.exports = {
+  constructResponse,
   ALLOWED_METHOD,
-  HOST,
   BASE_ROUTE,
   SECRET,
-  constructResponse,
+  HOST,
   PORT,
 };

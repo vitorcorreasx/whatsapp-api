@@ -16,7 +16,9 @@ async function buildServer(clientId = 'client-one') {
   const app = http.createServer((req, res) => {
     if (req.method !== ALLOWED_METHOD || !req.url.startsWith(BASE_ROUTE)) {
       res.statusCode = 405;
-      return res.end('Only POST requests are allowed');
+      return constructResponse(res, {
+        message: 'Only POST requests are allowed',
+      });
     }
 
     const { searchParams } = new URL(req.url, `http://${req.headers.host}`);
