@@ -1,6 +1,7 @@
 async function sendMessage(phonenumber, message, client) {
   try {
-    const receiverNumber = `${phonenumber}@c.us`;
+    const receiverNumber = parseNumber(phonenumber);
+    console.log(receiverNumber);
 
     const { ack } = await client.sendMessage(receiverNumber, message);
 
@@ -11,6 +12,10 @@ async function sendMessage(phonenumber, message, client) {
     console.error('Error trying to send message', { err });
     new Error(err);
   }
+}
+
+function parseNumber(number) {
+  return `${number}`.replace('+', '') + '@c.us';
 }
 
 module.exports = { sendMessage };
