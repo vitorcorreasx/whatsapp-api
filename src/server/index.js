@@ -1,14 +1,14 @@
 const { verify } = require('jsonwebtoken');
 const http = require('http');
 
+const { buildClient, sendMessage } = require('../services/whatsapp');
 const {
+  constructResponse,
   ALLOWED_METHOD,
-  HOST,
   BASE_ROUTE,
   SECRET,
-  senResponse,
+  HOST,
 } = require('../util');
-const { buildClient, send } = require('../services/whatsapp');
 
 async function buildServer(clientId = 'client-one') {
   const client = await buildClient(clientId);
@@ -29,16 +29,16 @@ async function buildServer(clientId = 'client-one') {
       res.writeHead(200, { 'Content-Type': 'application/json' });
 
       if (error) {
-        return senResponse(res, {
+        return constructResponse(res, {
           statusMessage: false,
           error: 'Invalid token',
         });
       }
       const { phonenumber, message } = payload;
 
-      const response = await send(phonenumber, message, client);
+      const response = await sendMessage(phonenumber, message, client);
 
-      return senResponse(res, response);
+      return constructResponse(res, response);
     });
   });
 

@@ -1,4 +1,4 @@
-const { client, buildClient, constructClient } = require('./client');
-const { send } = require('./send');
+const { buildClient } = require('./client');
+const { sendMessage } = require('./send');
 
-module.exports = { client, send, buildClient, constructClient };
+module.exports = { sendMessage, buildClient };
