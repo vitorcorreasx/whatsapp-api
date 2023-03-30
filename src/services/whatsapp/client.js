@@ -1,87 +1,36 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 
-const MESSAGE_ACK = {
-  ERROR: -1,
-  VALID: 0,
-};
-
-const TIME_HELPER = {
-  TEN_SECONDS: 10000,
-  HUNDRED_MILISEC: 100,
-};
-
 /**
- *
- * @returns {Promise<WhatsAppClient>}
+ * @typedef {{
+ * _events: object
+ * _eventsCount: number
+ * _maxListeners?: number
+ * options: OptionsClient
+ * authStrategy: object
+ * }} WhatsAppClient
  */
-async function buildClient() {
-  const messages = new Map();
-
-  const client = new Client({
-    authStrategy: new LocalAuth({
-      clientId: 'client-one',
-    }),
-    puppeteer: {
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    },
-  })
-
-    .on('qr', (qr) => {
-      qrcode.generate(qr, { small: true });
-    })
-    .on('message_ack', async (message, ack) => {
-      messages.set(message.id.id, ack);
-    });
-
-  await client.initialize();
-
-  return {
-    client,
-    async sendMessage(receiverId, body) {
-      await sendizinho(receiverId, body, client, messages);
-    },
-  };
-}
-
-async function sendizinho(receiverId, body, client, messages) {
-  const message = await client.sendMessage(receiverId, body);
-  const messageId = message.id.id;
-
-  let watchEvent;
-  let timeoutEvent;
-
-  return new Promise((resolve, reject) => {
-    watchEvent = setInterval(() => {
-      const statusMessage = messages.get(messageId);
-      if (statusMessage > MESSAGE_ACK.VALID) {
-        resolve({ statusMessage });
-      }
-      if (statusMessage === MESSAGE_ACK.ERROR) {
-        reject(new Error('Failed to send message'));
-      }
-    }, TIME_HELPER.HUNDRED_MILISEC);
-
-    timeoutEvent = setTimeout(() => {
-      reject(new Error('WhatsApp message timeout reached'));
-    }, TIME_HELPER.TEN_SECONDS);
-  }).finally(() => {
-    clearInterval(watchEvent);
-    clearTimeout(timeoutEvent);
-    messages.delete(messageId);
-  });
-}
+/**
+ * @typedef {{
+ * authStrategy: object
+ * puppeteer: object
+ * authTimeoutMs: number
+ * qrMaxRetries: number
+ * takeoverOnConflict: boolean
+ * takeoverTimeoutMs: number
+ * userAgent: string
+ * ffmpegPath: string
+ * bypassCSP: boolean
+ * }} OptionsClient
+ */
 
 /**
- *
+ * Constrói um cliente WhatsApp e monitora os eventos para sua configuração
  * @param {string} clientId
  * @returns {Promise<WhatsAppClient>}
  */
-async function constructClient(clientId) {
-  const messages = new Map();
-
-  const client = new Client({
+async function buildClient(clientId) {
+  return new Client({
     authStrategy: new LocalAuth({
       clientId,
     }),
@@ -97,15 +46,7 @@ async function constructClient(clientId) {
     .on('error', (err) => console.log({ err }))
     .on('ready', () => {
       console.log('ready');
-    })
-    .on('message_ack', async (message, ack) => {
-      messages.set(message.id.id, ack);
     });
-
-  return {
-    client,
-    messages,
-  };
 }
 
-module.exports = { buildClient, constructClient };
+module.exports = { buildClient };
