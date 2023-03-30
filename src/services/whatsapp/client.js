@@ -61,11 +61,11 @@ async function buildClient(clientId) {
         const { ack } = await client.sendMessage(receiverNumber, message);
 
         return {
-          statusMessage: ack,
+          statusText: ack,
         };
       } catch ({ message }) {
         return {
-          statusMessage: -1,
+          statusText: -1,
           error: message,
         };
       }

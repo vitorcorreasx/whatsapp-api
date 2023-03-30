@@ -30,7 +30,7 @@ async function buildServer(clientId = 'client-one') {
 
       if (error) {
         return constructResponse(res, {
-          statusMessage: false,
+          statusText: -1,
           error: 'Invalid token',
         });
       }
