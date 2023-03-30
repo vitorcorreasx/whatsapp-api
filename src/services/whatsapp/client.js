@@ -1,6 +1,10 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 
+function parseNumber(number) {
+  return `${number}`.replace('+', '') + '@c.us';
+}
+
 /**
  * @typedef {{
  * _events: object
@@ -30,7 +34,7 @@ const qrcode = require('qrcode-terminal');
  * @returns {Promise<WhatsAppClient>}
  */
 async function buildClient(clientId) {
-  return new Client({
+  const client = new Client({
     authStrategy: new LocalAuth({
       clientId,
     }),
@@ -45,8 +49,28 @@ async function buildClient(clientId) {
     })
     .on('error', (err) => console.log({ err }))
     .on('ready', () => {
-      console.log('ready');
+      console.log('ready'); // TODO: adicionar o logger
     });
+
+  await client.initialize();
+  return {
+    sendMessage: async (phone, message) => {
+      try {
+        const receiverNumber = parseNumber(phone);
+
+        const { ack } = await client.sendMessage(receiverNumber, message);
+
+        return {
+          statusMessage: ack,
+        };
+      } catch ({ message }) {
+        return {
+          statusMessage: -1,
+          error: message,
+        };
+      }
+    },
+  };
 }
 
 module.exports = { buildClient };

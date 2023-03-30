@@ -1,7 +1,7 @@
 const { verify } = require('jsonwebtoken');
 const http = require('http');
 
-const { buildClient, sendMessage } = require('../services/whatsapp');
+const { buildClient } = require('../services/whatsapp');
 const {
   constructResponse,
   ALLOWED_METHOD,
@@ -11,9 +11,7 @@ const {
 } = require('../util');
 
 async function buildServer(clientId = 'client-one') {
-  const client = await buildClient(clientId);
-
-  await client.initialize();
+  const { sendMessage } = await buildClient(clientId);
 
   const app = http.createServer((req, res) => {
     if (req.method !== ALLOWED_METHOD || !req.url.startsWith(BASE_ROUTE)) {
@@ -36,7 +34,7 @@ async function buildServer(clientId = 'client-one') {
       }
       const { phonenumber, message } = payload;
 
-      const response = await sendMessage(phonenumber, message, client);
+      const response = await sendMessage(phonenumber, message);
 
       return constructResponse(res, response);
     });
