@@ -20,25 +20,24 @@ async function buildServer(clientId = 'client-one') {
         message: 'Only POST requests are allowed',
       });
     }
+    req.on('data', (data) => {
+      const { token } = JSON.parse(data.toString());
+      verify(token, SECRET, { complete: true }, async (error, { payload }) => {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
 
-    const { searchParams } = new URL(req.url, `http://${req.headers.host}`);
+        if (error) {
+          return constructResponse(res, {
+            statusText: -1,
+            error: 'Invalid token',
+          });
+        }
 
-    const token = searchParams.get('token');
+        const { phonenumber, message } = payload;
 
-    verify(token, SECRET, { complete: true }, async (error, { payload }) => {
-      res.writeHead(200, { 'Content-Type': 'application/json' });
+        const response = await sendMessage(phonenumber, message);
 
-      if (error) {
-        return constructResponse(res, {
-          statusText: -1,
-          error: 'Invalid token',
-        });
-      }
-      const { phonenumber, message } = payload;
-
-      const response = await sendMessage(phonenumber, message);
-
-      return constructResponse(res, response);
+        return constructResponse(res, response);
+      });
     });
   });
 
