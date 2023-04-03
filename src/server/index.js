@@ -22,7 +22,7 @@ async function buildServer(clientId = 'client-one') {
     }
     req.on('data', (data) => {
       const { token } = JSON.parse(data.toString());
-      verify(token, SECRET, { complete: true }, async (error, { payload }) => {
+      verify(token, SECRET, { complete: true }, async (error, decoded) => {
         res.writeHead(200, { 'Content-Type': 'application/json' });
 
         if (error) {
@@ -32,7 +32,14 @@ async function buildServer(clientId = 'client-one') {
           });
         }
 
-        const { phonenumber, message } = payload;
+        const { phonenumber = null, message = null } = decoded?.payload;
+
+        if (!phonenumber || !message) {
+          return constructResponse(res, {
+            statusText: -1,
+            error: 'Payload not found',
+          });
+        }
 
         const response = await sendMessage(phonenumber, message);
 
