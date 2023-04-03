@@ -1,14 +1,9 @@
 const http = require('http');
+const { URL } = require('url');
 
 const { sign } = require('jsonwebtoken');
 
-const {
-  ALLOWED_METHOD,
-  BASE_ROUTE,
-  SECRET,
-  PORT,
-  HOST,
-} = require('./src/util');
+const { ALLOWED_METHOD, SECRET, HOST } = require('./src/util');
 
 function constructToken(message = 'Hello World', phonenumber = 5555999999999) {
   return sign({ message, phonenumber }, SECRET);
@@ -16,11 +11,13 @@ function constructToken(message = 'Hello World', phonenumber = 5555999999999) {
 
 const token = constructToken();
 
+const parsedUrl = new URL(HOST);
+
 const options = {
-  path: BASE_ROUTE,
+  host: parsedUrl.hostname,
+  port: parsedUrl.port || 3001,
+  path: parsedUrl.pathname,
   method: ALLOWED_METHOD,
-  hostname: HOST.replace('http://', ''),
-  port: PORT,
   headers: {
     'Content-Type': 'application/json',
   },
