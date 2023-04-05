@@ -1,9 +1,8 @@
-const http = require('http');
+const { sign } = require('jsonwebtoken');
+const { request } = require('http');
 const { URL } = require('url');
 
-const { sign } = require('jsonwebtoken');
-
-const { ALLOWED_METHOD, SECRET, HOST } = require('./src/util');
+const { SECRET, HOST, ALLOWED_METHODS } = require('../src/server/config');
 
 function constructToken(message = 'Hello World', phonenumber = 5555999999999) {
   return sign({ message, phonenumber }, SECRET);
@@ -13,20 +12,22 @@ const token = constructToken();
 
 const parsedUrl = new URL(HOST);
 
+const [method] = ALLOWED_METHODS;
+
 const options = {
-  host: parsedUrl.hostname,
-  port: parsedUrl.port || 3001,
-  path: parsedUrl.pathname,
-  method: ALLOWED_METHOD,
   headers: {
     'Content-Type': 'application/json',
   },
+  port: parsedUrl.port || 3001,
+  host: parsedUrl.hostname,
+  path: parsedUrl.pathname,
+  method,
 };
 
-const req = http.request(options, (res) => {
-  console.log(`statusCode: ${res.statusCode}`);
+const req = request(options, (response) => {
+  console.log(`statusCode: ${response.statusCode}`);
 
-  res.on('data', (d) => {
+  response.on('data', (d) => {
     return process.stdout.write(d);
   });
 });

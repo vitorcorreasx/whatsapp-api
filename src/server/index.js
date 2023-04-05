@@ -1,51 +1,50 @@
 const { verify } = require('jsonwebtoken');
-const http = require('http');
+const { createServer } = require('http');
 
+const { validateRequest, constructResponse, errorMessage } = require('../util');
+const { SECRET, HOST, HTTP_STATUS } = require('./config');
 const { buildClient } = require('../services/whatsapp');
-const {
-  constructResponse,
-  ALLOWED_METHOD,
-  BASE_ROUTE,
-  SECRET,
-  HOST,
-} = require('../util');
 
 async function buildServer(clientId = 'client-one') {
   const { sendMessage } = await buildClient(clientId);
 
-  const app = http.createServer((req, res) => {
-    if (req.method !== ALLOWED_METHOD || !req.url.startsWith(BASE_ROUTE)) {
-      res.statusCode = 405;
-      return constructResponse(res, {
-        message: 'Only POST requests are allowed',
+  const app = createServer((request, response) => {
+    validateRequest(request, response);
+
+    if (response.statusCode === HTTP_STATUS.OK) {
+      request.on('data', (data) => {
+        const { token } = JSON.parse(data.toString());
+
+        verify(
+          token,
+          SECRET,
+          { complete: true },
+          async (errorInValidationToken, decoded) => {
+            response.writeHead(HTTP_STATUS.OK, {
+              'Content-Type': 'application/json',
+            });
+
+            if (errorInValidationToken) {
+              return constructResponse(response, errorMessage('Invalid token'));
+            }
+
+            const { phonenumber = null, message = null } = decoded?.payload;
+
+            if (!phonenumber || !message) {
+              return constructResponse(
+                response,
+                errorMessage('Payload not found')
+              );
+            }
+
+            return constructResponse(
+              response,
+              await sendMessage(phonenumber, message)
+            );
+          }
+        );
       });
     }
-    req.on('data', (data) => {
-      const { token } = JSON.parse(data.toString());
-      verify(token, SECRET, { complete: true }, async (error, decoded) => {
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-
-        if (error) {
-          return constructResponse(res, {
-            statusText: -1,
-            error: 'Invalid token',
-          });
-        }
-
-        const { phonenumber = null, message = null } = decoded?.payload;
-
-        if (!phonenumber || !message) {
-          return constructResponse(res, {
-            statusText: -1,
-            error: 'Payload not found',
-          });
-        }
-
-        const response = await sendMessage(phonenumber, message);
-
-        return constructResponse(res, response);
-      });
-    });
   });
 
   return {
