@@ -1,34 +1,25 @@
 const { sign } = require('jsonwebtoken');
 const { request } = require('http');
 const { URL } = require('url');
-const { SECRET, HOST, ALLOWED_METHODS, PHONES } = require('../src/server/config');
-const Holidays = require('date-holidays')
+const { SECRET, HOST, ALLOWED_METHODS} = require('../src/server/config');
+const Holidays = require('date-holidays');
 
-const phones = PHONES.split(",")
+const phones = [555599353158,555584386891,555584060586,555596941288,555591385681];
 
-const hd = new Holidays()
-hd.init('BR', 'RS')
-
-const interns = {
-  1: phones[0],
-  2: phones[1],
-  3: phones[2],
-  4: phones[3],
-  5: phones[4],
-}
+const holiday = new Holidays();
+holiday.init('BR', 'RS');
 
 const getPersonDay = () => {
-  const day = new Date().getDay()
-  const isHd = hd.isHoliday(new Date())
-  if(isHd){
-    return
-  }
-  return interns[day]
-}
+  const day = new Date().getDay();
+  if( holiday.isHoliday(new Date()) ){
+    return;
+  };
+  return phones[day-1];
+};
 
 function constructToken(message = 'Buscar Fruta!', phonenumber = getPersonDay()) {
   return sign({ message, phonenumber }, SECRET);
-}
+};
 
 const token = constructToken();
 

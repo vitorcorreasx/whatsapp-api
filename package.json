@@ -7,7 +7,7 @@
     "dev": "nodemon index.js",
     "start": "node index.js",
     "send": "node scripts/send.js",
-    "notify": "node scripts/notifyFruit.js",
+    "notify": "node scripts/notify.js",
     "lint": "eslint ./src ./test --ext .ts",
     "lint:fix": "eslint ./src ./test --ext .ts --fix",
     "style:check": "prettier --check 'src/**/*.ts' 'test/**/*.ts'",
