@@ -4,7 +4,7 @@ const { URL } = require('url');
 const { SECRET, HOST, ALLOWED_METHODS} = require('../src/server/config');
 const Holidays = require('date-holidays');
 
-const phones = [555599353158,555584386891,555584060586,555596941288,555591385681];
+const {phones} = require('../db.json');
 
 const holiday = new Holidays();
 holiday.init('BR', 'RS');
