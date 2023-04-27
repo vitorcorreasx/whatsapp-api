@@ -4,7 +4,7 @@ const { URL } = require('url');
 const { SECRET, HOST, ALLOWED_METHODS} = require('../src/server/config');
 const Holidays = require('date-holidays');
 
-const {phones} = require('../db.json');
+const {interns} = require('../db.json');
 
 const holiday = new Holidays();
 holiday.init('BR', 'RS');
@@ -14,10 +14,11 @@ const getPersonDay = () => {
   if( holiday.isHoliday(new Date()) ){
     return;
   };
-  return phones[day-1];
+  return interns[day];
 };
+const {name} = getPersonDay()
 
-function constructToken(message = 'Buscar Fruta!', phonenumber = getPersonDay()) {
+function constructToken(message = `🍎 Bom dia, ${name}! Hoje é seu dia de buscar frutas! 🍌`, {phonenumber} = getPersonDay()) {
   return sign({ message, phonenumber }, SECRET);
 };
 
