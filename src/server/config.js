@@ -1,9 +1,10 @@
 require('dotenv').config();
 
-const HOST = 'http://localhost:3001/api/v1/send';
+const HOST = 'http://localhost:30005/api/v1/send';
 const SECRET = process.env.SECRET || 'segredo';
 const BASE_ROUTE = '/api/v1/send';
 const ALLOWED_METHODS = ['POST'];
+const {PHONES} = process.env
 
 const HTTP_STATUS = {
   METHOD_NOT_ALLOWED: 405,
@@ -16,4 +17,5 @@ module.exports = {
   BASE_ROUTE,
   SECRET,
   HOST,
+  PHONES
 };
